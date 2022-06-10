@@ -7,7 +7,7 @@ import os
 import random
 import tkinter
 from typing import Any
-
+from sys import argv
 from PIL import Image, ImageTk
 
 
@@ -23,8 +23,8 @@ class Application(tkinter.Frame):
         tkinter.Frame.__init__(self, master)
         master.title("tkinter canvas trial")
         self.img_target: Any = None
-        self.current_dir: str = os.getcwd()
-        self.first_dir: str = os.getcwd()
+        self.current_dir: str = str(argv[1]) if len(argv) >= 2 else os.getcwd()
+        self.first_dir: str = str(argv[1]) if len(argv) >= 2 else os.getcwd()
         self.create_widgets()
         self.pack()
 
@@ -111,13 +111,18 @@ def viewer() -> None:
 
 
 if __name__ == "__main__":
+    print(argv[1] if len(argv) >= 2 else os.getcwd())
     # ウィンドウを作成
     WINDOW = tkinter.Tk()
     # ウィンドウサイズ
     WINDOW.geometry("900x600")
     # ディレクトリの中のファイルをリストにして返す
-    PICT_LIST = glob.glob(os.path.join(os.getcwd(), "*.jpg"))
-    PICT_LIST.extend(glob.glob(os.path.join(os.getcwd(), "*.png")))
+    PICT_LIST = glob.glob(
+        os.path.join(argv[1] if len(argv) >= 2 else os.getcwd(), "*.jpg")
+    )
+    PICT_LIST.extend(
+        glob.glob(os.path.join(argv[1] if len(argv) >= 2 else os.getcwd(), "*.png"))
+    )
 
     random.shuffle(PICT_LIST)
 
