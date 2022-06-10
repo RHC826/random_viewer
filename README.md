@@ -16,7 +16,7 @@
 
 ## 使い方
 
-$ python random_viewer.py [something_dir]
+        $ python random_viewer.py [something_dir]
 
 お好きなディレクトリをシェルで開き、そこからこのスクリプトを起動してください。引数なしの場合カレントディレクトリの画像を表示します。
 
