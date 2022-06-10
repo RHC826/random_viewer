@@ -67,28 +67,30 @@ class Application(tkinter.Frame):
         self.img_on_canvas = self.canvas.create_image(
             0, 0, image=self.img_target, anchor=tkinter.NW
         )
-
+        ###########################################
+        ###########################################
         # 追加機能
-        # todo:
+        # 方針:
         #   1. 名前をまともにする。
         #   2. mypy に怒られないようにする。
         #       1. ラムダ式を def式に改める？
-#               2. ラムダ式のまま mypy の "foo of bar does not return a value" error を避ける？
+        #       2. ラムダ式のまま mypy の "foo of bar does not return a value" error を避ける？
         _tmps = []
-        self.dev_button = tkinter.Button(
+        self.book_mark_button = tkinter.Button(
             self,
             text="book mark",
             width=20,
             command=lambda: [_tmps.append(PICT.pict_list.pop(0)), self.pict_shuffle()],
         )
-        self.dev2_button = tkinter.Button(
+        self.book_mark_save = tkinter.Button(
             self,
             text="save",
             width=20,
-            command=lambda: open(r".\.random_viewer\bookmark.ini", "w+", encoding="utf-8").write(
-                ("\n").join(_tmps)
-            ),
+            command=lambda: open(
+                r".\.random_viewer\bookmark.ini", "w+", encoding="utf-8"
+            ).write(("\n").join(_tmps)),
         )
+        # キーボードショートカット
         self.bind_all(
             "<KeyPress-b>",
             lambda key: [PICT.book_mark(), self.pict_shuffle()],
@@ -98,9 +100,21 @@ class Application(tkinter.Frame):
             lambda key: [_tmps.append(PICT.pict_list.pop(0)), self.pict_shuffle()],
         )
         self.bind_all(
+            "<KeyPress-Y>",
+            lambda key: [
+                [_tmps.append(i) for i in PICT.pict_list],
+                self.pict_shuffle(),
+            ],
+        )
+        self.bind_all(
             "<KeyPress-x>",
             lambda key: [PICT.pict_list.pop(0), self.pict_shuffle()],
         )
+        self.bind_all("<KeyPress-q>", lambda key: self.quit())
+        self.bind_all("<KeyPress-v>", lambda key: viewer())
+        self.bind_all("<KeyPress-Return>", lambda key: self.pict_shuffle())
+        ############################
+        ############################
 
         self.hello_label.pack()
         self.canvas.pack()
@@ -109,8 +123,8 @@ class Application(tkinter.Frame):
         self.text_box_button.pack()
         self.viewer_button.pack()
         self.quit_button.pack()
-        self.dev_button.pack()
-        self.dev2_button.pack()
+        self.book_mark_button.pack()
+        self.book_mark_save.pack()
 
     def set_current_dir(self) -> None:
         """ディレクトリを交換する。無を入力することで最初に開いたディレクトリに戻る。"""
