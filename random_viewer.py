@@ -12,11 +12,6 @@ from typing import Any, List
 from PIL import Image, ImageTk
 
 
-class Picture:
-    def __init__(self, PICT_LIST: List[str]):
-        self.PICT_LIST: List[str] = PICT_LIST
-
-
 class Application(tkinter.Frame):
     """
     ビューワーのGUIに改善の余地あり
@@ -38,7 +33,9 @@ class Application(tkinter.Frame):
         """要素の配置を決定する"""
         # create a label
         self.hello_label = tkinter.Label(self, text="Random_Viewer")
-        self.hello_label.configure(text=self.current_dir)
+        self.hello_label.configure(
+            text=f"[{len(PICT.pict_list)}/1] {PICT.pict_list[0]}"
+        )
 
         # create a text box
         self.text_box = tkinter.Entry(self, width=25)
@@ -61,41 +58,48 @@ class Application(tkinter.Frame):
         # create a canvas
         self.canvas = tkinter.Canvas(self, width=400, height=400)
 
-        if len(PICT.PICT_LIST) > 0:
+        if len(PICT.pict_list) > 0:
             # create a image on canvas
-            tmp = Image.open(PICT.PICT_LIST[0])
+            tmp = Image.open(PICT.pict_list[0])
             self.img_target = ImageTk.PhotoImage(
                 tmp.resize((400, 400), Image.ANTIALIAS)
             )
         self.img_on_canvas = self.canvas.create_image(
             0, 0, image=self.img_target, anchor=tkinter.NW
         )
+
+        # 追加機能
+        # todo:
+        #   1. 名前をまともにする。
+        #   2. mypy に怒られないようにする。
+        #       1. ラムダ式を def式に改める？
+#               2. ラムダ式のまま mypy の "foo of bar does not return a value" error を避ける？
         _tmps = []
         self.dev_button = tkinter.Button(
             self,
             text="book mark",
             width=20,
-            command=lambda: [_tmps.append(PICT.PICT_LIST.pop(0)), self.pict_shuffle()],
+            command=lambda: [_tmps.append(PICT.pict_list.pop(0)), self.pict_shuffle()],
         )
         self.dev2_button = tkinter.Button(
             self,
             text="save",
             width=20,
-            command=lambda: open("data.txt", "w+", encoding="utf-8").write(
+            command=lambda: open(r".\.random_viewer\bookmark.ini", "w+", encoding="utf-8").write(
                 ("\n").join(_tmps)
             ),
         )
         self.bind_all(
             "<KeyPress-b>",
-            lambda key: [self.book_mark(), self.pict_shuffle()],
+            lambda key: [PICT.book_mark(), self.pict_shuffle()],
         )
         self.bind_all(
             "<KeyPress-y>",
-            lambda key: [_tmps.append(PICT.PICT_LIST.pop(0)), self.pict_shuffle()],
+            lambda key: [_tmps.append(PICT.pict_list.pop(0)), self.pict_shuffle()],
         )
         self.bind_all(
             "<KeyPress-x>",
-            lambda key: [PICT.PICT_LIST.pop(0), self.pict_shuffle()],
+            lambda key: [PICT.pict_list.pop(0), self.pict_shuffle()],
         )
 
         self.hello_label.pack()
@@ -117,37 +121,48 @@ class Application(tkinter.Frame):
         self.hello_label.configure(text=self.current_dir)
         os.chdir(self.current_dir)
 
-        PICT.PICT_LIST.clear()
-        PICT.PICT_LIST.extend(glob.glob("*.jpg"))
-        PICT.PICT_LIST.extend(glob.glob("*.png"))
+        PICT.pict_list.clear()
+        PICT.pict_list.extend(glob.glob("*.jpg"))
+        PICT.pict_list.extend(glob.glob("*.png"))
 
-        random.shuffle(PICT.PICT_LIST)
+        random.shuffle(PICT.pict_list)
 
     def pict_shuffle(self) -> None:
         """画像ファイルリストをシャッフルして、画像を表示する。"""
-        random.shuffle(PICT.PICT_LIST)
+        random.shuffle(PICT.pict_list)
 
-        if len(PICT.PICT_LIST) <= 0:
+        if len(PICT.pict_list) <= 0:
             return
 
-        tmp = Image.open(PICT.PICT_LIST[0].strip())
+        tmp = Image.open(PICT.pict_list[0].strip())
         tmp = tmp.resize((400, 400), Image.ANTIALIAS)
         self.hello_label.configure(
-            text=f"[{len(PICT.PICT_LIST)}/1] {PICT.PICT_LIST[0]}"
+            text=f"[{len(PICT.pict_list)}/1] {PICT.pict_list[0]}"
         )
         self.img_target = ImageTk.PhotoImage(tmp)
 
         self.canvas.itemconfig(self.img_on_canvas, image=self.img_target)
 
+
+class Picture:
+    """
+    画像リストなどを管理する。
+    リファクタリング として Application class の属性を一部引き受ける。
+    """
+
+    def __init__(self, pict_list: List[str]):
+        self.pict_list: List[str] = pict_list
+
     def book_mark(self) -> None:
-        PICT.PICT_LIST.clear()
-        with open("data.2txt", "r", encoding="utf-8") as r:
-            PICT.PICT_LIST = r.readlines()
+        """PICT＿LISTをブックマ－クの内容にする。"""
+        PICT.pict_list.clear()
+        with open(r".\.random_viewer\bookmark.ini", "r", encoding="utf-8") as r_book_mark:
+            PICT.pict_list = list(map(lambda x: x.strip(), r_book_mark.readlines()))
 
 
 def viewer() -> None:
     """画像ファイルを表示する。"""
-    target_path = PICT.PICT_LIST[0]
+    target_path = PICT.pict_list[0]
     tmp = Image.open(target_path)
     (tmp).show()
 
