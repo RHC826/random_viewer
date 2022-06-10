@@ -6,9 +6,15 @@ import glob
 import os
 import random
 import tkinter
-from typing import Any
 from sys import argv
+from typing import Any, List
+
 from PIL import Image, ImageTk
+
+
+class Picture:
+    def __init__(self, PICT_LIST: List[str]):
+        self.PICT_LIST: List[str] = PICT_LIST
 
 
 class Application(tkinter.Frame):
@@ -55,14 +61,41 @@ class Application(tkinter.Frame):
         # create a canvas
         self.canvas = tkinter.Canvas(self, width=400, height=400)
 
-        if len(PICT_LIST) > 0:
+        if len(PICT.PICT_LIST) > 0:
             # create a image on canvas
-            tmp = Image.open(PICT_LIST[0])
+            tmp = Image.open(PICT.PICT_LIST[0])
             self.img_target = ImageTk.PhotoImage(
                 tmp.resize((400, 400), Image.ANTIALIAS)
             )
         self.img_on_canvas = self.canvas.create_image(
             0, 0, image=self.img_target, anchor=tkinter.NW
+        )
+        _tmps = []
+        self.dev_button = tkinter.Button(
+            self,
+            text="book mark",
+            width=20,
+            command=lambda: [_tmps.append(PICT.PICT_LIST.pop(0)), self.pict_shuffle()],
+        )
+        self.dev2_button = tkinter.Button(
+            self,
+            text="save",
+            width=20,
+            command=lambda: open("data.txt", "w+", encoding="utf-8").write(
+                ("\n").join(_tmps)
+            ),
+        )
+        self.bind_all(
+            "<KeyPress-b>",
+            lambda key: [self.book_mark(), self.pict_shuffle()],
+        )
+        self.bind_all(
+            "<KeyPress-y>",
+            lambda key: [_tmps.append(PICT.PICT_LIST.pop(0)), self.pict_shuffle()],
+        )
+        self.bind_all(
+            "<KeyPress-x>",
+            lambda key: [PICT.PICT_LIST.pop(0), self.pict_shuffle()],
         )
 
         self.hello_label.pack()
@@ -72,6 +105,8 @@ class Application(tkinter.Frame):
         self.text_box_button.pack()
         self.viewer_button.pack()
         self.quit_button.pack()
+        self.dev_button.pack()
+        self.dev2_button.pack()
 
     def set_current_dir(self) -> None:
         """ディレクトリを交換する。無を入力することで最初に開いたディレクトリに戻る。"""
@@ -82,30 +117,37 @@ class Application(tkinter.Frame):
         self.hello_label.configure(text=self.current_dir)
         os.chdir(self.current_dir)
 
-        PICT_LIST.clear()
-        PICT_LIST.extend(glob.glob("*.jpg"))
-        PICT_LIST.extend(glob.glob("*.png"))
+        PICT.PICT_LIST.clear()
+        PICT.PICT_LIST.extend(glob.glob("*.jpg"))
+        PICT.PICT_LIST.extend(glob.glob("*.png"))
 
-        random.shuffle(PICT_LIST)
+        random.shuffle(PICT.PICT_LIST)
 
     def pict_shuffle(self) -> None:
         """画像ファイルリストをシャッフルして、画像を表示する。"""
-        random.shuffle(PICT_LIST)
+        random.shuffle(PICT.PICT_LIST)
 
-        if len(PICT_LIST) <= 0:
+        if len(PICT.PICT_LIST) <= 0:
             return
 
-        tmp = Image.open(PICT_LIST[0])
+        tmp = Image.open(PICT.PICT_LIST[0].strip())
         tmp = tmp.resize((400, 400), Image.ANTIALIAS)
-        self.hello_label.configure(text=PICT_LIST[0])
+        self.hello_label.configure(
+            text=f"[{len(PICT.PICT_LIST)}/1] {PICT.PICT_LIST[0]}"
+        )
         self.img_target = ImageTk.PhotoImage(tmp)
 
         self.canvas.itemconfig(self.img_on_canvas, image=self.img_target)
 
+    def book_mark(self) -> None:
+        PICT.PICT_LIST.clear()
+        with open("data.2txt", "r", encoding="utf-8") as r:
+            PICT.PICT_LIST = r.readlines()
+
 
 def viewer() -> None:
     """画像ファイルを表示する。"""
-    target_path = PICT_LIST[0]
+    target_path = PICT.PICT_LIST[0]
     tmp = Image.open(target_path)
     (tmp).show()
 
@@ -126,5 +168,6 @@ if __name__ == "__main__":
 
     random.shuffle(PICT_LIST)
 
+    PICT = Picture(PICT_LIST)
     APP = Application(master=WINDOW)
     APP.mainloop()
