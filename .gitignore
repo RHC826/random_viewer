@@ -1,2 +1,4 @@
 Makefile
-.random_viewer\*
+*.ini
+*.bak
+.random_viewer/
