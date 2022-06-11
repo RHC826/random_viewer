@@ -74,8 +74,8 @@ class Application(tkinter.Frame):
         # 方針:
         #   1. 名前をまともにする。
         #   2. mypy に怒られないようにする。
-        #       1. ラムダ式を def式に改める？
-        #       2. ラムダ式のまま mypy の "foo of bar does not return a value" error を避ける？
+        #       1. ラムダ文を def文に改める？
+        #       2. ラムダ文のまま mypy の "foo of bar does not return a value" error を避ける？
         PICT.register = []
         self.book_mark_button = tkinter.Button(
             self,
