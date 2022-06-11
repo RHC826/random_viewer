@@ -94,6 +94,12 @@ class Application(tkinter.Frame):
                 r".\.random_viewer\bookmark.ini", "w+", encoding="utf-8"
             ).write(("\n").join(PICT.register)),
         )
+        self.book_mark_load = tkinter.Button(
+            self,
+            text="load",
+            width=20,
+            command=lambda : [PICT.book_mark(), self.pict_shuffle()]
+        )
         # キーボードショートカット
         self.bind_all(
             "<KeyPress-b>",
@@ -132,6 +138,8 @@ class Application(tkinter.Frame):
         self.quit_button.pack()
         self.book_mark_button.pack()
         self.book_mark_save.pack()
+        self.book_mark_load.pack()
+
 
     def set_current_dir(self) -> None:
         """ディレクトリを交換する。無を入力することで最初に開いたディレクトリに戻る。"""
@@ -199,7 +207,7 @@ if __name__ == "__main__":
     # ウィンドウを作成
     WINDOW = tkinter.Tk()
     # ウィンドウサイズ
-    WINDOW.geometry("900x600")
+    WINDOW.geometry("900x650")
     # ディレクトリの中のファイルをリストにして返す
     PICT_LIST = glob.glob(
         os.path.join(argv[1] if len(argv) >= 2 else os.getcwd(), "*.jpg")
