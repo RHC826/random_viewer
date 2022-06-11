@@ -148,12 +148,12 @@ class Application(tkinter.Frame):
 
         random.shuffle(PICT.pict_list)
 
-    def pict_shuffle(self) -> None:
+    def pict_shuffle(self) -> bool:
         """画像ファイルリストをシャッフルして、画像を表示する。"""
         random.shuffle(PICT.pict_list)
 
         if len(PICT.pict_list) <= 0:
-            return
+            return False
 
         tmp = Image.open(PICT.pict_list[0].strip())
         tmp = tmp.resize((400, 400), Image.ANTIALIAS)
@@ -164,6 +164,7 @@ class Application(tkinter.Frame):
 
         self.canvas.itemconfig(self.img_on_canvas, image=self.img_target)
 
+        return True
 
 class Picture:
     """
@@ -175,13 +176,15 @@ class Picture:
         self.pict_list: List[str] = pict_list
         self.register: List[str] = list()
 
-    def book_mark(self) -> None:
+    def book_mark(self) -> bool:
         """PICT＿LISTをブックマ－クの内容にする。"""
         PICT.pict_list.clear()
         with open(
-            r".\.random_viewer\bookmark.ini", "r", encoding="utf-8"
+            r".\.random_viewer\bookmark.ini", "r+", encoding="utf-8"
         ) as r_book_mark:
             PICT.pict_list = list(map(lambda x: x.strip(), r_book_mark.readlines()))
+
+        return True
 
 
 def viewer() -> None:
