@@ -123,6 +123,12 @@ class Application(tkinter.Frame):
             "<KeyPress-x>",
             lambda key: [PICT.pict_list.pop(0), self.pict_shuffle()],
         )
+#        self.bind_all(
+#            "<KeyPress-Esv>",
+#            =lambda: open(
+#                r".\.random_viewer\bookmark.ini", "w+", encoding="utf-8"
+#            ).write(("\n").join(PICT.register))
+#        )
         self.bind_all("<KeyPress-q>", lambda key: self.quit())
         self.bind_all("<KeyPress-v>", lambda key: viewer())
         self.bind_all("<KeyPress-Return>", lambda key: self.pict_shuffle())
