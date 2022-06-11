@@ -22,7 +22,7 @@ class Application(tkinter.Frame):
 
     def __init__(self, master: Any) -> None:
         tkinter.Frame.__init__(self, master)
-        master.title("tkinter canvas trial")
+        master.title("random_viewer")
         self.img_target: Any = None
         self.current_dir: str = str(argv[1]) if len(argv) >= 2 else os.getcwd()
         self.first_dir: str = str(argv[1]) if len(argv) >= 2 else os.getcwd()
