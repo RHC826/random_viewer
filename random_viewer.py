@@ -67,6 +67,7 @@ class Application(tkinter.Frame):
         self.img_on_canvas = self.canvas.create_image(
             0, 0, image=self.img_target, anchor=tkinter.NW
         )
+
         ###########################################
         ###########################################
         # 追加機能
@@ -75,12 +76,15 @@ class Application(tkinter.Frame):
         #   2. mypy に怒られないようにする。
         #       1. ラムダ式を def式に改める？
         #       2. ラムダ式のまま mypy の "foo of bar does not return a value" error を避ける？
-        _tmps = []
+        PICT.register = []
         self.book_mark_button = tkinter.Button(
             self,
             text="book mark",
             width=20,
-            command=lambda: [_tmps.append(PICT.pict_list.pop(0)), self.pict_shuffle()],
+            command=lambda: [
+                PICT.register.append(PICT.pict_list.pop(0)),
+                self.pict_shuffle(),
+            ],
         )
         self.book_mark_save = tkinter.Button(
             self,
@@ -88,7 +92,7 @@ class Application(tkinter.Frame):
             width=20,
             command=lambda: open(
                 r".\.random_viewer\bookmark.ini", "w+", encoding="utf-8"
-            ).write(("\n").join(_tmps)),
+            ).write(("\n").join(PICT.register)),
         )
         # キーボードショートカット
         self.bind_all(
@@ -97,12 +101,15 @@ class Application(tkinter.Frame):
         )
         self.bind_all(
             "<KeyPress-y>",
-            lambda key: [_tmps.append(PICT.pict_list.pop(0)), self.pict_shuffle()],
+            lambda key: [
+                PICT.register.append(PICT.pict_list.pop(0)),
+                self.pict_shuffle(),
+            ],
         )
         self.bind_all(
             "<KeyPress-Y>",
             lambda key: [
-                [_tmps.append(i) for i in PICT.pict_list],
+                [PICT.register.append(i) for i in PICT.pict_list],
                 self.pict_shuffle(),
             ],
         )
@@ -113,8 +120,8 @@ class Application(tkinter.Frame):
         self.bind_all("<KeyPress-q>", lambda key: self.quit())
         self.bind_all("<KeyPress-v>", lambda key: viewer())
         self.bind_all("<KeyPress-Return>", lambda key: self.pict_shuffle())
-        ############################
-        ############################
+        ###########################################
+        ###########################################
 
         self.hello_label.pack()
         self.canvas.pack()
@@ -166,11 +173,14 @@ class Picture:
 
     def __init__(self, pict_list: List[str]):
         self.pict_list: List[str] = pict_list
+        self.register: List[str] = list()
 
     def book_mark(self) -> None:
         """PICT＿LISTをブックマ－クの内容にする。"""
         PICT.pict_list.clear()
-        with open(r".\.random_viewer\bookmark.ini", "r", encoding="utf-8") as r_book_mark:
+        with open(
+            r".\.random_viewer\bookmark.ini", "r", encoding="utf-8"
+        ) as r_book_mark:
             PICT.pict_list = list(map(lambda x: x.strip(), r_book_mark.readlines()))
 
 
